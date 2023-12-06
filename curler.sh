@@ -5,51 +5,46 @@ read -p "Enter the URL: " url
 echo "Sending cURL requests for each HTTP method to $url"
 echo "==================================="
 
+# Function to perform HTTP request and display results
+perform_request() {
+    local method=$1
+    echo "$method request:"
+    response=$(curl -s -o /dev/null -w "%{http_code}" -X "$method" "$url")
+    body=$(curl -s -X "$method" "$url")
+    echo "Response Body:"
+    echo "$body"
+    echo "Status code: $response"
+    if [ -n "$body" ]; then
+        echo "JSON format:"
+        echo "$body" | jq '.'
+    fi
+    echo "==================================="
+}
+
+# Ensure jq is installed
+if ! command -v jq &> /dev/null
+then
+    echo "jq could not be found, please install jq to process JSON"
+    exit 1
+fi
+
 # HTTP GET request
-echo "GET request:"
-response=$(curl -s -o /dev/null -w "%{http_code}" -X GET "$url")
-curl -X GET "$url"
-echo "Status code: $response"
-echo "==================================="
+perform_request GET
 
 # HTTP POST request
-echo "POST request:"
-response=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$url")
-curl -X POST "$url"
-echo "Status code: $response"
-echo "==================================="
+perform_request POST
 
 # HTTP PUT request
-echo "PUT request:"
-response=$(curl -s -o /dev/null -w "%{http_code}" -X PUT "$url")
-curl -X PUT "$url"
-echo "Status code: $response"
-echo "==================================="
+perform_request PUT
 
 # HTTP DELETE request
-echo "DELETE request:"
-response=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE "$url")
-curl -X DELETE "$url"
-echo "Status code: $response"
-echo "==================================="
+perform_request DELETE
 
 # HTTP HEAD request
-echo "HEAD request:"
-response=$(curl -s -o /dev/null -w "%{http_code}" -X HEAD "$url")
-curl -X HEAD "$url"
-echo "Status code: $response"
-echo "==================================="
+perform_request HEAD
 
 # HTTP OPTIONS request
-echo "OPTIONS request:"
-response=$(curl -s -o /dev/null -w "%{http_code}" -X OPTIONS "$url")
-curl -X OPTIONS "$url"
-echo "Status code: $response"
-echo "==================================="
+perform_request OPTIONS
 
 # HTTP PATCH request
-echo "PATCH request:"
-response=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH "$url")
-curl -X PATCH "$url"
-echo "Status code: $response"
-echo "==================================="
+perform_request PATCH
